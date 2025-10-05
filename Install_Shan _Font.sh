@@ -44,7 +44,7 @@ echo -e "${GREEN}Storage permission granted.${RESET}"
 echo
 
 # 2. Font folder
-FONT_DIR="/storage/emulated/0/Download/Shan Font"
+FONT_DIR="$HOME/Shan Font"
 mkdir -p "$FONT_DIR"
 echo -e "${CYAN}[2/5] Font folder ready at:${RESET} $FONT_DIR"
 echo
