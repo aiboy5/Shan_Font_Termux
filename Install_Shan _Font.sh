@@ -9,6 +9,7 @@ YELLOW="\033[1;33m"
 GREEN="\033[1;32m"
 RED="\033[1;31m"
 WHITE="\033[1;37m"
+CYAN="\033[1;36m"
 RESET="\033[0m"
 PURPLE="\033[1;35m"
 
@@ -43,10 +44,20 @@ sleep 1
 echo -e "${GREEN}Storage permission granted.${RESET}"
 echo
 
-# 2. Font folder
-FONT_DIR="$HOME/Shan Font"
-mkdir -p "$FONT_DIR"
-echo -e "${CYAN}[2/5] Font folder ready at:${RESET} $FONT_DIR"
+# 2. Font folder - Check local project directory first, then Termux home folder
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOCAL_FONT_DIR="$SCRIPT_DIR/Shan_Font"
+DOWNLOAD_FONT_DIR="/data/data/com.termux/files/home/Shan_Font"
+
+# Try local project directory first
+if [ -d "$LOCAL_FONT_DIR" ]; then
+    FONT_DIR="$LOCAL_FONT_DIR"
+    echo -e "${CYAN}[2/5] Using local font folder:${RESET} $FONT_DIR"
+else
+    FONT_DIR="$DOWNLOAD_FONT_DIR"
+    mkdir -p "$FONT_DIR"
+    echo -e "${CYAN}[2/5] Using Download font folder:${RESET} $FONT_DIR"
+fi
 echo
 
 # 3. List fonts
@@ -54,7 +65,14 @@ mapfile -t fonts < <(ls "$FONT_DIR"/*.ttf "$FONT_DIR"/*.TTF 2>/dev/null)
 
 if [ ${#fonts[@]} -eq 0 ]; then
     echo -e "${YELLOW}⚠️ No fonts found in $FONT_DIR${RESET}"
-    echo "Please copy your Shan fonts folder into <Download> folder and run again."
+    if [ "$FONT_DIR" = "$LOCAL_FONT_DIR" ]; then
+        echo "Please add your .ttf font files to the 'Shan_Font' folder in this project directory."
+        echo "Example: cp /path/to/your/fonts/*.ttf \"$LOCAL_FONT_DIR/\""
+    else
+        echo "No local 'Shan_Font' folder found. Creating Download folder fallback."
+        echo "Please copy your .ttf font files to: $DOWNLOAD_FONT_DIR"
+        echo "Or create a 'Shan_Font' folder in this project directory: $SCRIPT_DIR"
+    fi
     exit 1
 fi
 
